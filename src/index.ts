@@ -1,18 +1,34 @@
-/**
- * Adds two numbers
- * @param firstNumber Consists of the first numeric operand of the addition
- * @param secondNumber Consists of the second numeric operand of the addition
- * @return The addition of the two numbers `firstNumber` and `secondNumber`
- *
- * Usage:
- * ```typescript
- * add(1, 7) = 8
- * add(1.7, 3.5) = 5.2
- * ```
- */
- export function add(firstNumber: number, secondNumber: number) {
-    return firstNumber + secondNumber;
+import * as fs from 'fs';
+import {spawn} from 'child_process';
+import { join } from "path"; 
+
+
+const filename: string = process.argv[3];
+const dirPath = join('.', 'exercise.csv');
+
+fs.access(filename, fs.constants.R_OK, (err) => {
+  console.log('\n> Checking Permission for reading the file');
+  if (!filename) {
+    throw Error('A file to watch must be specified');
+  } 
+  if (err) {
+    console.log('Error!');
   }
-  
-  console.log(`add(1, 7): ${add(1, 7)}`);
-  console.log(`add(1.7, 3.5): ${add(1.7, 3.5)}`);
+  else
+    console.log('File can be read');
+});
+
+fs.watch(filename, () => {
+  const cat = spawn('cat', [filename])
+  cat.stdout.pipe(process.stdout)
+});
+/*
+fs.watch(filename, (err) => {
+  if (err) {
+    console.log('Error!');
+  } else {
+    const cut = spawn('cut', ['-d', ',', '-f', '3', filename]);
+    cut.stdout.pipe(process.stdout);
+  }
+});
+*/
