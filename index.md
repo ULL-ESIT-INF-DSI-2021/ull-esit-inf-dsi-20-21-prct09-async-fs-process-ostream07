@@ -310,7 +310,7 @@ Por ejemplo, ¿qué sucede si indica desde la línea de comandos un fichero que 
 
 Para resolver este ejercicio y mediante el uso de **yargs**, se han creado dos comandos, `pipe` y `event`.
 
-Pipe, es un comando, que va a requerir como argumento obligatorio una ruta donde se deberá encontrar el fichero a analizar y luego podremos apsarle varios parámetros opciones siendo estos ``--lines` para contar las líneas del fichero, `--words` para contar las palabras que lo conforman o `--characters` para ver el número exacto de caracteres del mismo.
+Pipe, es un comando, que va a requerir como argumento obligatorio una ruta donde se deberá encontrar el fichero a analizar y luego podremos apsarle varios parámetros opciones siendo estos `--lines` para contar las líneas del fichero, `--words` para contar las palabras que lo conforman o `--characters` para ver el número exacto de caracteres del mismo.
 
 Los parámetros serán almacenados en un vecor de strings donde se irán haciendo push detro del mismo de cada uno de estos comandos si estos son empleados para luego ser usados por la función `spawn`, que nos devolverá un **child_process**. Su método de uso es `spawn('commad', [list with the command options, 'route']);`. 
 En nuestro caso, vamos a crear una variable nueva, llamada `subprocess` de tipo `ChildProcessWithoutNullStreams` que va a recoger el spawn que tendrá como string el comando a usar que es `wc` y luego entre corchetes, el vector de strings que había rellenado, finalmente, le pasaremos la ruta donde va a estar el fichero a analizar. Para compilar cada uno de los ficheros, podemos ir al package.json y editar el script build y luego ejecutar `npm run build`. Veamos el fragmento de código:
