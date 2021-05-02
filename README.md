@@ -143,9 +143,89 @@ Para poder realizar esto, tendríamos que indicarle el directorio donde se van a
  Veamos un ejemplo de ejecución:
 
  ```
- 
+
  ```
 
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#### --> Ejercicio 4
+
+Finalmente, para este ejercicio vamos a crear una aplicación que permita hacer de wrapper de los distintos comandos empleados en Linux para el manejo de ficheros y directorios. En concreto, la aplicación deberá permitir:
+
+1. Dada una ruta concreta, mostrar si es un directorio o un fichero ``(comando stat)``.
+2. Crear un nuevo directorio a partir de una nueva ruta que recibe como parámetro ``(comando mkdir)``.
+3. Listar los ficheros dentro de un directorio ``(comando list)``.
+4. Mostrar el contenido de un fichero ``(comando cat)``.
+5. Borrar ficheros y directorios ``(comando rm)``.
+6. Mover y copiar ficheros y/o directorios de una ruta a otra. Para este caso, la aplicación recibirá una ruta origen y una ruta destino. En caso de que la ruta origen represente un directorio, se debe copiar dicho directorio y todo su contenido a la ruta destino ``(comando cp)``.
+
+Para interactuar con la aplicación a través de la línea de comandos vamos a requerir de yargs.
+
+Como en los ejercicios anteriores, con yargs podremos definir una serie de comandos, estos serán los siguientes:
+
+* stat
+* mkdir
+* ls
+* cat
+* rm
+* cp
+
+Todos ellos, a excepción del comando `cp` van a requerir de un único parámetro, que será la ruta del fichero o directorio destino para aplicar estos comandos. Por su parte, **cp** va a necesitar no solo la ruta de origen sino también una ubicación de destino. Además, va a usar una función llamada `recursiveCopy` que nos va a permitir un directorio que tenga contenido en su interior de forma recursiva.
+
+recursiveCopy(origin: string, destiny: string) recibe como parámetros la ruta de origen y la de destino. Esta llama a la función stat, que tiene la dirección de origen y un callback de error en caso de que algo estuviera mal y de stats, que va a revisar si es un directorio. En caso de no serlo, será un fichero por lo que no va a necesitar que lo copien recursivamente y se hará uso de la función `copyFile` que tendrá la ruta de destino, así com unas callbacks en caso de que algo vaya mal.
+
+Suponiendo que se trata de un directorio, llamamos a `basename` que va  tener la ruta de origen y luego vamos a crear una nueva variable que al hacer un `join` con la dirección de destino y el fileName, llamaremos a `mkdir` para que la cree. Si algo sale mal, saltará la callback de error. También puede pasar que exista un problema al leer el contenido con `readdir` para poder copiarlo luego, es por ello que debemos preveer también el posible error lanzando un mensaje con un problema listando el contenido.
+Finalmente, si llegamos al `forof` de la línea 21, recorremoscada uno de los files y hacemos que la función se llame así misma para realizar la copia recursiva en el directorio de destino. Esto podemos verlo en el código siguiente correspondiente a la función que acabamos de analizar: 
+
+```
+stat(origin, (err, stats) => {
+    if (err) {
+      console.log('Error!');
+    } else {
+      if (stats.isDirectory()) {
+        let fileName = basename(origin);
+        let newFolder = join(destiny, fileName);
+        mkdir(newFolder, (err) => {
+          if (err) {
+            console.log('Error while copying');
+          } else {
+            readdir(origin, (err, files) => {
+              if (err) {
+                console.log('Error listing the content');
+              } else {
+                for (const file of files) {
+                  recursiveCopy(join(newFolder, file), join(origin, file));
+                }
+              }
+            })
+          }
+        });
+      } else {
+        stat(destiny, (err, stats) => {
+          if (err) {
+            if (err.code === 'ENOENT') {
+              copyFile(origin, destiny, (err) => {
+                if (err) {
+                  console.log('Error while copying 34');
+                }
+              })
+            }
+            console.log('Error');
+          } else {
+            if (stats.isDirectory()) {
+              destiny = join(destiny, basename(origin));
+            }
+            copyFile(origin, destiny, (err) => {
+              if (err) {
+                console.log('Error while copying 45');
+              }
+```
+
+Finalmente, veamos algunos ejemplos de ejecución:
+
+```
+
+```
 
 
 
