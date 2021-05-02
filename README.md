@@ -20,6 +20,42 @@ También podremos encontrar información referida a la **API síncrona de Node.j
 * [API asíncrona proporcionada por Node.js](https://nodejs.org/dist/latest/docs/api/child_process.html#child_process_asynchronous_process_creation)
 * [Función spawn](https://nodejs.org/dist/latest/docs/api/child_process.html#child_process_child_process_spawn_command_args_options)
 
+
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#### --> Ejercicio 1
+
+Realizar una traza teniendo en cuenta el siguiente código:
+
+```
+import { access, constants, watch } from 'fs';
+
+if (process.argv.length !== 3) {
+  console.log('Please, specify a file');
+} else {
+  const filename = process.argv[2];
+
+  access(filename, constants.F_OK, (err) => {
+    if (err) {
+      console.log(`File ${filename} does not exist`);
+    } else {
+      console.log(`Starting to watch file ${filename}`);
+
+      const watcher = watch(process.argv[2]);
+
+      watcher.on('change', () => {
+        console.log(`File ${filename} has been modified somehow`);
+      });
+
+      console.log(`File ${filename} is no longer watched`);
+    }
+  });
+}
+```
+
+Al iniciarse el proceso, main pasa a la pila de llamadas
+
+
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #### --> Ejercicio 2

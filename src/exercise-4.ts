@@ -2,6 +2,11 @@ import { stat, mkdir, readdir, readFile, rm, copyFile } from "fs";
 import { basename, join } from "path";
 import * as yargs from 'yargs';
 
+/**
+ * Function that allow to copy a file or a directory
+ * @param origin Origin route
+ * @param destiny Destiny route
+ */
 function recursiveCopy(origin: string, destiny: string) {
   stat(origin, (err, stats) => {
     if (err) {
