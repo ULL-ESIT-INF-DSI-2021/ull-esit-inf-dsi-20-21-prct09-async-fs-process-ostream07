@@ -91,11 +91,60 @@ Aquí vemos además la callback en caso de error, tanto por un problema con el c
 
 ```
 
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#### --> Ejercicio 3
+
+A partir de la aplicación de procesamiento de notas desarrollada en la práctica anterior, tenemos que conseguir una aplicación que reciba desde la línea de comandos el nombre de un usuario de la aplicación de notas, así como la ruta donde se almacenan las notas de dicho usuario. 
+Gestionaremos los parámetros desde la línea de comandos haciendo uso de yargs. La aplicación a desarrollar deberá controlar los cambios realizados sobre todo el directorio especificado al mismo tiempo que dicho usuario interactúa con la aplicación de procesamiento de notas. Nótese que no hace falta modificar absolutamente nada en la aplicación de procesamiento de notas. Es una aplicación que se va a utilizar para provocar cambios en el sistema de ficheros.
+Su funcionamiento será simple, en una terminal usaremos [watch](https://nodejs.org/dist/latest/docs/api/fs.html#fs_fs_watch_filename_options_listener) para escuchar, mientras que en la otra tendremos abierta la práctca anterior realizando cambios en las notas y podremos ver que esto nos lo reflejará la función watch por la terminal.
+
+Con cada cambio detectado en el directorio observado, el programa debe emitir un **Watcher** para indicar si se ha añadido, modificado o borrado una nota, además de indicar el nombre concreto del fichero creado, modificado o eliminado para alojar dicha nota. Veamos un fragmento del código:
+
+```
+if (typeof argv.route === 'string' && typeof argv.user === 'string') {
+      const directoryName: string = argv.route;
+      access(argv.route, constants.F_OK, (err) => {
+        if (err) {
+          console.log(`Directory ${directoryName} does not exist!`);
+        } else {
+          const watcher = watch(directoryName);
+
+          watcher.on('change', (eventType, fileName) => {
+            switch (eventType) {
+              case 'rename':
+                access(join(directoryName, fileName.toString()), constants.F_OK, (err) => {
+                  if(err) {
+                    console.log(`File ${fileName} was deleted`);
+                  } else {
+                    console.log(`File ${fileName} was created`);
+                  }
+                });
+              case 'change':
+                console.log(`File ${fileName} was modified`);
+            }
+          });
+        }
+      });
+    }
+```
+
+Apoyándonos en yargs, vamos a tener un comando llamado **watch** que necesitará obligatoriamente de dos prámetros, uno con la ruta de lo que vamos a escuchar y el nombre del usuario de este directorio. Lo primero que haremos, será comprobar si el directorio existe y sino, lanzar un mensaje de error. Una vez superado este punto, vamos a tener dos tipos de eventos que se pueden emitir, un evento de tipo `rename` siempre que el fichero sea borrado o eliminado o un evento tipo `change` que saldrá en caso de que el objetivo que estamos observando sea modificado.
 
 
+* ¿Cómo haría para mostrar, no solo el nombre, sino también el contenido del fichero, en el caso de que haya sido creado o modificado?
 
+La respuesta es hacer un readfile al fichero cuando se crea o cuando se modifica, es decir, leemos el fichero primero y en caso de que no haya un error imprimimos el contenido.
 
+* ¿Cómo haría para que no solo se observase el directorio de un único usuario sino todos los directorios correspondientes a los diferentes usuarios de la aplicación de notas?
 
+Para poder realizar esto, tendríamos que indicarle el directorio donde se van a encontrar todos los directorios de la notas de los usuarios e indicarle la opción **recursive**. Le mandas un objeto con recursive y si el recursive es true va a escuchar todos los ficheros que cuelgan de este directorio donde están las carpetas del usuario.
+
+ Veamos un ejemplo de ejecución:
+
+ ```
+ 
+ ```
 
 
 
