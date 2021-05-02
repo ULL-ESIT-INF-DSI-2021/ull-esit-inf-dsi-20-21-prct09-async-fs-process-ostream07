@@ -85,11 +85,26 @@ En nuestro caso, vamos a crear una variable nueva, llamada `subprocess` de tipo 
       });
 ```
 
-Aquí vemos además la callback en caso de error, tanto por un problema con el comando o porque el fichero no existe o se ha utilizado una opción no válida. En estos casos, redirigiríamos la salida del error como un error nuestro. Es decir, cuando este pograma falla, ahora se muestra un error indicando el motivo, debido a que se ha redigirido la salida del mismo como un error nuestro y que es mostrado por pantalla con el uso de `pipe` resolviendo de esta forma la pregunta formulada en el guión. Veamos un ejemplo de ejecución:
+Aquí vemos además la callback en caso de error, tanto por un problema con el comando o porque el fichero no existe o se ha utilizado una opción no válida. En estos casos, redirigiríamos la salida del error como un error nuestro. Es decir, cuando este pograma falla, ahora se muestra un error indicando el motivo, debido a que se ha redigirido la salida del mismo como un error nuestro y que es mostrado por pantalla con el uso de `pipe` resolviendo de esta forma la pregunta formulada en el guión. Veamos unos ejemplos de ejecución:
 
+```
+node src/exercise-2.js pipe --route README.txt --lines --words --characters
+wc: README.txt: No existe el archivo o el directorio
+Command exited with code 1
+```
+El fichero README.txt no existe y por tanto, se lanza el error.
+
+```
+node src/exercise-2.js event --route README.md --lines --words --characters
+  262  2128 17276 README.md
 ```
 
 ```
+node src/exercise-2.js pipe --route README.md --lines --words --characters
+  262  2128 17276 README.md
+```
+
+Se puede ver como en ambos casos muestra el mismo número de líneas, palabras y caracteres que tenía en ese momento el README.md.
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -131,6 +146,49 @@ if (typeof argv.route === 'string' && typeof argv.user === 'string') {
 
 Apoyándonos en yargs, vamos a tener un comando llamado **watch** que necesitará obligatoriamente de dos prámetros, uno con la ruta de lo que vamos a escuchar y el nombre del usuario de este directorio. Lo primero que haremos, será comprobar si el directorio existe y sino, lanzar un mensaje de error. Una vez superado este punto, vamos a tener dos tipos de eventos que se pueden emitir, un evento de tipo `rename` siempre que el fichero sea borrado o eliminado o un evento tipo `change` que saldrá en caso de que el objetivo que estamos observando sea modificado.
 
+Veamos un ejemplo de ejecución:
+
+```
+Terminal 1:
+
+node src/exercise-3.js watch --route ../../prueba/edusegre --user=edusegre
+```
+
+Al ejecutar este comando, se mantiene esperando que algo cambie en la ruta que le hemos proporcioando, vamos a ver que pasa si abrimos otra terminal y realizamos un cambio:
+
+```
+Terminal 2: 
+
+npx ts-node src/index.ts add --user="edusegre" --title="Test note" --body="This is a test note" --color="green"
+New note added!
+
+Terminal 1:
+
+File index.json was modified
+File index.json was modified
+File Test_note.json was modified
+File Test_note.json was modified
+File Test_note.json was created
+```
+
+Podemos ver en este caso, como se ha creado con éxito una nueva nota y hemos podido observar los cambios ocurridos sobre ese directorio. Ahora vamos a intentar eliminar esta nota para ver qué ocurre:
+
+```
+Terminal 2: 
+
+npx ts-node src/index.ts remove --user="edusegre" --title="Test note"
+Correctly removed
+
+Terminal 1:
+
+File Test_note.json was modified
+File Test_note.json was deleted
+File index.json was modified
+```
+
+Como debía pasar, la nota fue correctamente eliminada, y pudimos observar desde nuestra terminal los cambios que se produjeron en el directorio que estábamos observando. 
+
+Ahora podemos responder a las preguntas que se nos formulan en el guión de la práctica:
 
 * ¿Cómo haría para mostrar, no solo el nombre, sino también el contenido del fichero, en el caso de que haya sido creado o modificado?
 
@@ -140,11 +198,6 @@ La respuesta es hacer un readfile al fichero cuando se crea o cuando se modifica
 
 Para poder realizar esto, tendríamos que indicarle el directorio donde se van a encontrar todos los directorios de la notas de los usuarios e indicarle la opción **recursive**. Le mandas un objeto con recursive y si el recursive es true va a escuchar todos los ficheros que cuelgan de este directorio donde están las carpetas del usuario.
 
- Veamos un ejemplo de ejecución:
-
- ```
-
- ```
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -224,7 +277,39 @@ stat(origin, (err, stats) => {
 Finalmente, veamos algunos ejemplos de ejecución:
 
 ```
+node src/exercise-4.js stat --route src
+The given route is a directory
 
+node src/exercise-4.js mkdir --route ejemplo
+Directory created
+
+node src/exercise-4.js ls --route ejemplo
+Directory content: 
+```
+
+Ahora dentro de ejemplo vamos a crear dos ficheros:
+touch file1.txt 
+touch file2.txt
+
+```
+node src/exercise-4.js ls --route ejemplo
+Directory content: 
+        file1.txt
+        file2.txt
+
+node src/exercise-4.js cat --route ejemplo/file1.txt
+estos es el ejemplo 1
+
+node src/exercise-4.js cp --destinyRoute ejemplo --originRoute README.md
+
+node src/exercise-4.js ls --route ejemplo
+Directory content: 
+        README.md
+        file1.txt
+        file2.txt
+
+node src/exercise-4.js rm --route ejemplo
+Deleted
 ```
 
 

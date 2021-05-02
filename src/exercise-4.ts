@@ -118,7 +118,7 @@ yargs.command({
         if (err) {
           console.log('Error');
         } else {
-          console.log('Directory content: ');
+          console.log('\nDirectory content: ');
           for (const file of files) {
             console.log('\t' + file);
           }
